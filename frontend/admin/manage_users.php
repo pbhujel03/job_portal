@@ -28,6 +28,7 @@ if ($_SESSION['user_id'] == 0) {
 // Get role filter from URL parameter
 $selected_role = isset($_GET['role']) ? $_GET['role'] : '';
 $selected_status = isset($_GET['status']) ? $_GET['status'] : '';
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 // Build query based on filters
 $where_conditions = [];
@@ -38,6 +39,11 @@ if ($selected_role && in_array($selected_role, ['job_seeker', 'recruiter'])) {
 
 if ($selected_status && in_array($selected_status, ['active', 'pending', 'suspended'])) {
     // You can add status column logic here if you have it in the database
+}
+
+if (!empty($search_query)) {
+    $search_escaped = $conn->real_escape_string($search_query);
+    $where_conditions[] = "(full_name LIKE '%$search_escaped%' OR email LIKE '%$search_escaped%')";
 }
 
 $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
@@ -63,6 +69,8 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
+
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet">
@@ -177,15 +185,17 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
     <!-- SideNavBar Shell -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
-        <div class="flex items-center gap-md mb-xl px-md">
-            <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-primary" data-icon="rocket_launch">rocket_launch</span>
+        <a href="dashboard.php" class="admin-sidebar-brand">
+            <img src="../assets/images/Job1.png" alt="" class="admin-sidebar-brand__icon">
+            <div class="admin-sidebar-brand__text">
+                <span class="admin-sidebar-brand__job">Job</span>
+                <span class="admin-sidebar-brand__portal">Portal</span>
             </div>
-            <div>
-                <h1 class="font-title-md text-title-md font-bold text-surface-container-lowest">RecruitFlow</h1>
-                <p class="text-[10px] text-secondary-fixed-dim tracking-widest uppercase">Admin Console</p>
-            </div>
-        </div>
+        </a>
+
+
+
+
         <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
                 href="dashboard.php">
@@ -203,17 +213,7 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                 <span class="font-body-md text-body-md">Job Management</span>
             </a>
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-                <span class="font-body-md text-body-md">Reports</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
-                <span class="font-body-md text-body-md">Analytics</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
+                href="settings.php">
                 <span class="material-symbols-outlined" data-icon="settings">settings</span>
                 <span class="font-body-md text-body-md">Settings</span>
             </a>
@@ -233,11 +233,13 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
+                    <div
+                        class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
                         <?php echo strtoupper(substr($admin_user['full_name'], 0, 1) . substr(explode(' ', $admin_user['full_name'])[1] ?? '', 0, 1)); ?>
                     </div>
                     <div class="hidden lg:block text-left">
-                        <p class="font-body-md font-bold text-on-surface"><?php echo htmlspecialchars($admin_user['full_name']); ?></p>
+                        <p class="font-body-md font-bold text-on-surface">
+                            <?php echo htmlspecialchars($admin_user['full_name']); ?></p>
                         <p class="font-label-md text-label-md text-on-surface-variant">System Admin</p>
                     </div>
                 </div>
@@ -261,10 +263,12 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                         <div>
                             <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
                                 Total Users</p>
-                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo number_format($total_users_count); ?>
+                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">
+                                <?php echo number_format($total_users_count); ?>
                             </h3>
                             <p class="text-primary font-label-md text-label-md flex items-center mt-2">
-                                <span class="material-symbols-outlined text-sm mr-1">trending_up</span> <?php echo number_format($job_seekers_count); ?> Candidates
+                                <span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                                <?php echo number_format($job_seekers_count); ?> Candidates
                             </p>
                         </div>
                         <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
@@ -277,7 +281,8 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                         <div>
                             <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
                                 Recruiters</p>
-                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo number_format($recruiters_count); ?>
+                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">
+                                <?php echo number_format($recruiters_count); ?>
                             </h3>
                             <p class="text-emerald-600 font-label-md text-label-md flex items-center mt-2">
                                 <span class="material-symbols-outlined text-sm mr-1">check_circle</span> Hiring Partners
@@ -294,7 +299,8 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                         <div>
                             <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
                                 Candidates</p>
-                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo number_format($job_seekers_count); ?>
+                            <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">
+                                <?php echo number_format($job_seekers_count); ?>
                             </h3>
                             <p class="text-tertiary font-label-md text-label-md flex items-center mt-2">
                                 <span class="material-symbols-outlined text-sm mr-1">history</span> Job Seekers
@@ -340,13 +346,15 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                             class="px-4 py-2 text-primary font-label-md text-label-md font-bold hover:bg-primary/5 rounded-lg transition-all">Clear
                             Filters</button>
                     </div>
-                    <div class="relative w-72">
+                    <form method="get" class="relative w-72">
+                        <input type="hidden" name="role" value="<?php echo htmlspecialchars($selected_role); ?>">
                         <span
                             class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm">search</span>
                         <input
+                            name="search"
                             class="pl-10 pr-4 py-2 w-full border border-outline-variant rounded-lg text-body-md font-body-md focus:ring-primary focus:border-primary"
-                            placeholder="Search Users..." type="text">
-                    </div>
+                            placeholder="Search Users..." type="text" value="<?php echo htmlspecialchars($search_query); ?>" onchange="this.form.submit()">
+                    </form>
                 </div>
                 <!-- Data Table -->
                 <div class="overflow-x-auto">
@@ -371,55 +379,63 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant/10">
-                            <?php 
+                            <?php
                             if ($users_result->num_rows > 0) {
                                 while ($user = $users_result->fetch_assoc()) {
                                     $initials = strtoupper(substr($user['full_name'], 0, 1) . substr(explode(' ', $user['full_name'])[1] ?? '', 0, 1));
                                     $role_badge = $user['role'] === 'job_seeker' ? 'Candidate' : 'Recruiter';
                                     $role_color = $user['role'] === 'job_seeker' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
                                     $date_joined = date('M d, Y', strtotime($user['created_at']));
-                            ?>
-                            <tr class="hover:bg-surface-container-low/30 transition-colors">
-                                <td class="px-lg py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-fixed font-bold text-sm border border-outline-variant/20">
-                                            <?php echo $initials; ?>
-                                        </div>
-                                        <div>
-                                            <p class="font-body-md text-body-md font-bold text-on-surface"><?php echo htmlspecialchars($user['full_name']); ?>
-                                            </p>
-                                            <p class="font-label-md text-label-md text-on-surface-variant">
-                                                <?php echo htmlspecialchars($user['email']); ?></p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-lg py-4">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $role_color; ?>"><?php echo $role_badge; ?></span>
-                                </td>
-                                <td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant"><?php echo $date_joined; ?>
-                                </td>
-                                <td class="px-lg py-4">
-                                    <span
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
-                                    </span>
-                                </td>
-                                <td class="px-lg py-4 text-right">
-                                        <div class="flex items-center justify-end gap-2">
-                                            <a href="view_user.php?id=<?php echo $user['user_id']; ?>" class="p-1.5 hover:text-primary transition-colors" title="View">
-                                                <span class="material-symbols-outlined text-[20px]">visibility</span>
-                                            </a>
-                                            <a href="edit_user.php?id=<?php echo $user['user_id']; ?>" class="p-1.5 hover:text-primary transition-colors" title="Edit">
-                                                <span class="material-symbols-outlined text-[20px]">edit</span>
-                                            </a>
-                                            <a href="#" onclick="if(confirm('Delete this user?')){ window.location='delete_user.php?id=<?php echo $user['user_id']; ?>'; } return false;" class="p-1.5 hover:text-error transition-colors" title="Delete">
-                                                <span class="material-symbols-outlined text-[20px]">delete</span>
-                                            </a>
-                                        </div>
-                                </td>
-                            </tr>
-                            <?php 
+                                    ?>
+                                    <tr class="hover:bg-surface-container-low/30 transition-colors">
+                                        <td class="px-lg py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-fixed font-bold text-sm border border-outline-variant/20">
+                                                    <?php echo $initials; ?>
+                                                </div>
+                                                <div>
+                                                    <p class="font-body-md text-body-md font-bold text-on-surface">
+                                                        <?php echo htmlspecialchars($user['full_name']); ?>
+                                                    </p>
+                                                    <p class="font-label-md text-label-md text-on-surface-variant">
+                                                        <?php echo htmlspecialchars($user['email']); ?>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-lg py-4">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $role_color; ?>"><?php echo $role_badge; ?></span>
+                                        </td>
+                                        <td class="px-lg py-4 font-body-md text-body-md text-on-surface-variant">
+                                            <?php echo $date_joined; ?>
+                                        </td>
+                                        <td class="px-lg py-4">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                            </span>
+                                        </td>
+                                        <td class="px-lg py-4 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <a href="view_user.php?id=<?php echo $user['user_id']; ?>"
+                                                    class="p-1.5 hover:text-primary transition-colors" title="View">
+                                                    <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                                </a>
+                                                <a href="edit_user.php?id=<?php echo $user['user_id']; ?>"
+                                                    class="p-1.5 hover:text-primary transition-colors" title="Edit">
+                                                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                                                </a>
+                                                <a href="#"
+                                                    onclick="if(confirm('Delete this user?')){ window.location='delete_user.php?id=<?php echo $user['user_id']; ?>'; } return false;"
+                                                    class="p-1.5 hover:text-error transition-colors" title="Delete">
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php
                                 }
                             } else {
                                 echo '<tr><td colspan="5" class="px-lg py-8 text-center text-on-surface-variant">No users found.</td></tr>';

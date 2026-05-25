@@ -133,16 +133,16 @@
     <!-- SideNavBar Component -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
-        <div class="flex items-center gap-md mb-xl px-md">
-            <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-primary" data-icon="rocket_launch">rocket_launch</span>
+        <a href="dashboard.php" class="flex items-center gap-3 mb-xl px-md">
+            <img src="../assets/images/Job1.png" alt="" class="w-11 h-11 shrink-0 rounded-[10px] object-cover">
+            <div class="flex flex-col justify-center leading-none gap-0.5 min-w-0">
+                <span class="text-[10px] font-bold text-surface-container-lowest tracking-[0.18em] uppercase">Job</span>
+                <span class="text-[22px] font-black text-surface-container-lowest uppercase tracking-tight leading-none">Portal</span>
             </div>
-            <div>
-                <h1 class="font-title-md text-title-md font-bold text-surface-container-lowest leading-tight">
-                    RecruitFlow</h1>
-                <p class="text-[10px] text-secondary-fixed-dim tracking-widest uppercase">Job Seeker</p>
-            </div>
-        </div>
+        </a>
+
+
+
         <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
             <a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-base transition-transform active:scale-95"
                 href="#">

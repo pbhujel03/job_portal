@@ -168,7 +168,14 @@ if (isset($_POST['login'])) {
     <!-- TopNavBar -->
     <header class="w-full top-0 bg-surface border-b border-outline-variant shadow-sm sticky z-50">
         <div class="flex justify-between items-center max-w-container-max mx-auto px-margin-desktop py-unit-md">
-            <a class="font-headline-md text-headline-md font-bold text-primary" href="index.php">JobPortal</a>
+                <a href="index.php" class="flex items-center gap-3 shrink-0">
+                    <img src="../assets/images/Job1.png" alt="" class="w-11 h-11 shrink-0 rounded-[10px] object-cover">
+                    <div class="flex flex-col justify-center leading-none gap-0.5">
+                        <span class="text-[10px] font-bold text-on-surface-variant tracking-[0.18em] uppercase">Job</span>
+                        <span class="text-[22px] font-black text-primary uppercase tracking-tight leading-none">Portal</span>
+                    </div>
+                </a>
+
             <div class="flex items-center gap-unit-md">
                 <a href="register.php" class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors px-unit-md py-unit-sm">Sign Up</a>
             </div>
@@ -230,8 +237,15 @@ if (isset($_POST['login'])) {
     <footer class="w-full bottom-0 bg-inverse-surface py-unit-xl text-white">
         <div class="flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto px-margin-desktop gap-unit-lg">
             <div class="flex flex-col items-center md:items-start">
-                <span class="font-headline-md font-bold text-primary mb-2">JobPortal</span>
-                <p class="font-body-sm text-white/60 max-w-xs text-center md:text-left">© 2026 JobPortal. All rights reserved.</p>
+                <a href="index.php" class="flex items-center gap-3 mb-2">
+                    <img src="../assets/images/Job1.png" alt="" class="w-10 h-10 shrink-0 rounded-[10px] object-cover">
+                    <div class="flex flex-col justify-center leading-none gap-0.5">
+                        <span class="text-[9px] font-bold text-white/80 tracking-[0.18em] uppercase">Job</span>
+                        <span class="text-lg font-black text-white uppercase tracking-tight leading-none">Portal</span>
+                    </div>
+                </a>
+
+                <p class="font-body-sm text-white/60 max-w-xs text-center md:text-left">© 2026. All rights reserved.</p>
             </div>
             <nav class="flex flex-wrap justify-center gap-unit-lg">
                 <a class="font-body-sm text-white/80 hover:text-primary transition-colors" href="#">Privacy Policy</a>

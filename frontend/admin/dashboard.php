@@ -21,7 +21,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role']
         $admin_result = $conn->query("SELECT * FROM users WHERE user_id = " . intval($_SESSION['user_id']) . " AND role = 'admin'");
         $admin_user = $admin_result->fetch_assoc();
     }
-    
+
     if (!$admin_user) {
         // Not an admin, redirect to login
         header("Location: ../public/login.php");
@@ -108,7 +108,9 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>RecruitFlow Admin Console</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
+
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet">
@@ -233,15 +235,17 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
     <!-- SideNavBar Component -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
-        <div class="flex items-center gap-md mb-xl px-md">
-            <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-primary" data-icon="rocket_launch">rocket_launch</span>
+        <a href="dashboard.php" class="admin-sidebar-brand">
+            <img src="../assets/images/Job1.png" alt="" class="admin-sidebar-brand__icon">
+            <div class="admin-sidebar-brand__text">
+                <span class="admin-sidebar-brand__job">Job</span>
+                <span class="admin-sidebar-brand__portal">Portal</span>
             </div>
-            <div>
-                <h1 class="font-title-md text-title-md font-bold text-surface-container-lowest">RecruitFlow</h1>
-                <p class="text-[10px] text-secondary-fixed-dim tracking-widest uppercase">Admin Console</p>
-            </div>
-        </div>
+        </a>
+
+
+
+
         <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
             <a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-base transition-transform active:scale-95"
                 href="#">
@@ -260,17 +264,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                 <span class="font-body-md text-body-md">Job Management</span>
             </a>
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-                <span class="font-body-md text-body-md">Reports</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
-                <span class="font-body-md text-body-md">Analytics</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
+                href="settings.php">
                 <span class="material-symbols-outlined" data-icon="settings">settings</span>
                 <span class="font-body-md text-body-md">Settings</span>
             </a>
@@ -288,17 +282,20 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
                             data-icon="search">search</span>
                         <input class="w-full bg-transparent border-none focus:ring-0 py-2 pl-10 pr-4 text-body-md"
-                            placeholder="Search for jobs, recruiters, or candidates..." type="text" name="search" value="<?php echo htmlspecialchars($search_query); ?>">
+                            placeholder="Search for jobs, recruiters, or candidates..." type="text" name="search"
+                            value="<?php echo htmlspecialchars($search_query); ?>">
                     </div>
                 </form>
             </div>
             <div class="flex items-center gap-md">
                 <div class="flex items-center gap-sm">
-                    <div class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
+                    <div
+                        class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
                         <?php echo strtoupper(substr($admin_user['full_name'], 0, 1) . substr(explode(' ', $admin_user['full_name'])[1] ?? '', 0, 1)); ?>
                     </div>
                     <div class="hidden lg:block text-left">
-                        <p class="font-body-md font-bold text-on-surface"><?php echo htmlspecialchars($admin_user['full_name']); ?></p>
+                        <p class="font-body-md font-bold text-on-surface">
+                            <?php echo htmlspecialchars($admin_user['full_name']); ?></p>
                         <p class="text-[10px] text-on-surface-variant">System Admin</p>
                     </div>
                 </div>
@@ -322,7 +319,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     </div>
                     <div>
                         <p class="text-on-surface-variant font-label-md">Total Users</p>
-                        <h2 class="text-headline-lg font-headline-lg text-on-surface"><?php echo number_format($total_users); ?></h2>
+                        <h2 class="text-headline-lg font-headline-lg text-on-surface">
+                            <?php echo number_format($total_users); ?></h2>
                     </div>
                 </div>
                 <!-- Jobs Posted -->
@@ -339,7 +337,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     </div>
                     <div>
                         <p class="text-on-surface-variant font-label-md">Jobs Posted</p>
-                        <h2 class="text-headline-lg font-headline-lg text-on-surface"><?php echo number_format($total_jobs); ?></h2>
+                        <h2 class="text-headline-lg font-headline-lg text-on-surface">
+                            <?php echo number_format($total_jobs); ?></h2>
                     </div>
                 </div>
                 <!-- Applications -->
@@ -356,7 +355,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     </div>
                     <div>
                         <p class="text-on-surface-variant font-label-md">Applications</p>
-                        <h2 class="text-headline-lg font-headline-lg text-on-surface"><?php echo number_format($total_applications); ?></h2>
+                        <h2 class="text-headline-lg font-headline-lg text-on-surface">
+                            <?php echo number_format($total_applications); ?></h2>
                     </div>
                 </div>
                 <!-- Shortlisted -->
@@ -372,7 +372,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     </div>
                     <div>
                         <p class="text-on-surface-variant font-label-md">Shortlisted</p>
-                        <h2 class="text-headline-lg font-headline-lg text-on-surface"><?php echo number_format($shortlisted); ?></h2>
+                        <h2 class="text-headline-lg font-headline-lg text-on-surface">
+                            <?php echo number_format($shortlisted); ?></h2>
                     </div>
                 </div>
                 <!-- Active Users -->
@@ -389,7 +390,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     </div>
                     <div>
                         <p class="text-on-surface-variant font-label-md">Active Now</p>
-                        <h2 class="text-headline-lg font-headline-lg text-on-surface"><?php echo number_format($active_users); ?></h2>
+                        <h2 class="text-headline-lg font-headline-lg text-on-surface">
+                            <?php echo number_format($active_users); ?></h2>
                     </div>
                 </div>
             </div>
@@ -398,7 +400,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                 <div
                     class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
                     <h3 class="font-title-md text-on-surface">Recent Job Seekers</h3>
-                    <a href="manage_users.php?role=job_seeker" class="text-primary font-body-md font-bold hover:underline">View All</a>
+                    <a href="manage_users.php?role=job_seeker"
+                        class="text-primary font-body-md font-bold hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left font-body-md">
@@ -412,33 +415,38 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant">
-                            <?php while ($seeker = $job_seekers_query->fetch_assoc()): 
+                            <?php while ($seeker = $job_seekers_query->fetch_assoc()):
                                 $initials = strtoupper(substr($seeker['full_name'], 0, 1) . substr(explode(' ', $seeker['full_name'])[1] ?? '', 0, 1));
-                            ?>
-                            <tr>
-                                <td class="px-lg py-md">
-                                    <div class="flex items-center gap-md">
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs">
-                                            <?php echo $initials; ?></div>
-                                        <div>
-                                            <p class="font-bold"><?php echo htmlspecialchars($seeker['full_name']); ?></p>
-                                            <p class="text-xs text-on-surface-variant"><?php echo htmlspecialchars($seeker['email']); ?></p>
+                                ?>
+                                <tr>
+                                    <td class="px-lg py-md">
+                                        <div class="flex items-center gap-md">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs">
+                                                <?php echo $initials; ?>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold"><?php echo htmlspecialchars($seeker['full_name']); ?>
+                                                </p>
+                                                <p class="text-xs text-on-surface-variant">
+                                                    <?php echo htmlspecialchars($seeker['email']); ?></p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-lg py-md">
-                                    <div class="flex gap-xs">
+                                    </td>
+                                    <td class="px-lg py-md">
+                                        <div class="flex gap-xs">
+                                            <span
+                                                class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold">Job
+                                                Seeker</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-lg py-md text-center font-bold text-on-surface-variant">
+                                        <?php echo $seeker['app_count']; ?></td>
+                                    <td class="px-lg py-md text-right">
                                         <span
-                                            class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold">Job Seeker</span>
-                                    </div>
-                                </td>
-                                <td class="px-lg py-md text-center font-bold text-on-surface-variant"><?php echo $seeker['app_count']; ?></td>
-                                <td class="px-lg py-md text-right">
-                                    <span
-                                        class="text-[10px] font-bold uppercase tracking-wider text-on-tertiary-fixed bg-tertiary-fixed px-2 py-1 rounded-full">Active</span>
-                                </td>
-                            </tr>
+                                            class="text-[10px] font-bold uppercase tracking-wider text-on-tertiary-fixed bg-tertiary-fixed px-2 py-1 rounded-full">Active</span>
+                                    </td>
+                                </tr>
                             <?php endwhile; ?>
                     </table>
                 </div>
@@ -448,7 +456,8 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                 <div
                     class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
                     <h3 class="font-title-md text-on-surface">Recent Recruiters</h3>
-                    <a href="manage_users.php?role=recruiter" class="text-primary font-body-md font-bold hover:underline">View All</a>
+                    <a href="manage_users.php?role=recruiter"
+                        class="text-primary font-body-md font-bold hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left font-body-md">
@@ -462,30 +471,34 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline-variant">
-                            <?php while ($recruiter = $recruiters_query->fetch_assoc()): 
+                            <?php while ($recruiter = $recruiters_query->fetch_assoc()):
                                 $initials = strtoupper(substr($recruiter['full_name'], 0, 1) . substr(explode(' ', $recruiter['full_name'])[1] ?? '', 0, 1));
-                            ?>
-                            <tr>
-                                <td class="px-lg py-md">
-                                    <div class="flex items-center gap-md">
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">
-                                            <?php echo $initials; ?></div>
-                                        <div>
-                                            <p class="font-bold"><?php echo htmlspecialchars($recruiter['full_name']); ?></p>
-                                            <p class="text-xs text-on-surface-variant"><?php echo htmlspecialchars($recruiter['email']); ?></p>
+                                ?>
+                                <tr>
+                                    <td class="px-lg py-md">
+                                        <div class="flex items-center gap-md">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">
+                                                <?php echo $initials; ?>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold">
+                                                    <?php echo htmlspecialchars($recruiter['full_name']); ?></p>
+                                                <p class="text-xs text-on-surface-variant">
+                                                    <?php echo htmlspecialchars($recruiter['email']); ?></p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-lg py-md">
-                                    <span class="text-xs font-medium text-on-surface-variant">Recruitment</span>
-                                </td>
-                                <td class="px-lg py-md text-center font-bold text-on-surface-variant"><?php echo $recruiter['jobs_posted']; ?></td>
-                                <td class="px-lg py-md text-right">
-                                    <span
-                                        class="text-[10px] font-bold uppercase tracking-wider text-on-primary-container bg-primary-container/20 px-2 py-1 rounded-full border border-primary-container/30">Verified</span>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="px-lg py-md">
+                                        <span class="text-xs font-medium text-on-surface-variant">Recruitment</span>
+                                    </td>
+                                    <td class="px-lg py-md text-center font-bold text-on-surface-variant">
+                                        <?php echo $recruiter['jobs_posted']; ?></td>
+                                    <td class="px-lg py-md text-right">
+                                        <span
+                                            class="text-[10px] font-bold uppercase tracking-wider text-on-primary-container bg-primary-container/20 px-2 py-1 rounded-full border border-primary-container/30">Verified</span>
+                                    </td>
+                                </tr>
                             <?php endwhile; ?>
                     </table>
                 </div>
@@ -505,21 +518,27 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                         <div class="flex justify-between text-xs mb-1 font-bold"><span class="">Reviewed</span><span
                                 class=""><?php echo number_format($total_reviewed); ?></span></div>
                         <div class="w-full bg-surface-container-high h-6 rounded-lg overflow-hidden">
-                            <div class="bg-primary h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_reviewed / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-80 transition-all duration-1000"></div>
+                            <div
+                                class="bg-primary h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_reviewed / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-80 transition-all duration-1000">
+                            </div>
                         </div>
                     </div>
                     <div class="relative">
                         <div class="flex justify-between text-xs mb-1 font-bold"><span class="">Shortlisted</span><span
                                 class=""><?php echo number_format($total_shortlisted); ?></span></div>
                         <div class="w-full bg-surface-container-high h-6 rounded-lg overflow-hidden">
-                            <div class="bg-primary h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_shortlisted / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-60 transition-all duration-1000"></div>
+                            <div
+                                class="bg-primary h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_shortlisted / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-60 transition-all duration-1000">
+                            </div>
                         </div>
                     </div>
                     <div class="relative">
                         <div class="flex justify-between text-xs mb-1 font-bold"><span class="">Rejected</span><span
                                 class=""><?php echo number_format($total_rejected); ?></span></div>
                         <div class="w-full bg-surface-container-high h-6 rounded-lg overflow-hidden">
-                            <div class="bg-error h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_rejected / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-40 transition-all duration-1000"></div>
+                            <div
+                                class="bg-error h-full <?php echo ($total_applied > 0) ? 'w-[' . ($total_rejected / $total_applied * 100) . '%]' : 'w-0'; ?> opacity-40 transition-all duration-1000">
+                            </div>
                         </div>
                     </div>
                 </div>

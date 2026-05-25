@@ -141,16 +141,16 @@
     <!-- SideNavBar Shell -->
     <aside
         class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-outline-variant flex flex-col py-lg px-md z-50">
-        <div class="flex items-center gap-sm mb-xl">
-            <div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary">
-                <span class="material-symbols-outlined">psychology</span>
+        <a href="dashboard.php" class="flex items-center gap-3 mb-xl px-md">
+            <img src="../assets/images/Job1.png" alt="" class="w-11 h-11 shrink-0 rounded-[10px] object-cover">
+            <div class="flex flex-col justify-center leading-none gap-0.5 min-w-0">
+                <span class="text-[10px] font-bold text-on-surface-variant tracking-[0.18em] uppercase">Job</span>
+                <span class="text-[22px] font-black text-primary uppercase tracking-tight leading-none">Portal</span>
             </div>
-            <div>
-                <h1 class="font-title-md text-title-md font-bold text-primary">RecruitFlow</h1>
-                <p class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">AI Recruiter
-                    Dashboard</p>
-            </div>
-        </div>
+        </a>
+
+
+
         <nav class="flex-1 space-y-1">
             <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10 transition-colors duration-200"
                 href="#">
@@ -300,15 +300,7 @@
                             </div>
                             <div class="flex gap-md text-on-surface-variant font-body-md text-body-md mb-md">
                                 <div class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[18px]">location_on</span> San
-                                    Francisco, CA
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[18px]">calendar_today</span> Posted 3
-                                    days ago
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-4 gap-md border-t border-outline-variant pt-md">
+                                
                                 <div>
                                     <p class="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Total Apps
                                     </p>

@@ -58,6 +58,7 @@ $jobs_result = $jobs_query;
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -171,15 +172,17 @@ $jobs_result = $jobs_query;
     <!-- SideNavBar Shell -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
-        <div class="flex items-center gap-md mb-xl px-md">
-            <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-                <span class="material-symbols-outlined text-on-primary" data-icon="rocket_launch">rocket_launch</span>
+        <a href="dashboard.php" class="admin-sidebar-brand">
+            <img src="../assets/images/Job1.png" alt="" class="admin-sidebar-brand__icon">
+            <div class="admin-sidebar-brand__text">
+                <span class="admin-sidebar-brand__job">Job</span>
+                <span class="admin-sidebar-brand__portal">Portal</span>
             </div>
-            <div>
-                <h1 class="font-title-md text-title-md font-bold text-surface-container-lowest">RecruitFlow</h1>
-                <p class="text-[10px] text-secondary-fixed-dim tracking-widest uppercase">Admin Console</p>
-            </div>
-        </div>
+        </a>
+
+
+
+
         <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
                 href="dashboard.php">
@@ -197,17 +200,7 @@ $jobs_result = $jobs_query;
                 <span class="font-body-md text-body-md">Job Management</span>
             </a>
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-                <span class="font-body-md text-body-md">Reports</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
-                <span class="font-body-md text-body-md">Analytics</span>
-            </a>
-            <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
+                href="settings.php">
                 <span class="material-symbols-outlined" data-icon="settings">settings</span>
                 <span class="font-body-md text-body-md">Settings</span>
             </a>
@@ -227,11 +220,13 @@ $jobs_result = $jobs_query;
         </div>
         <div class="flex items-center space-x-6">
             <div class="flex items-center space-x-3 ml-4">
-                <div class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
+                <div
+                    class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
                     <?php echo strtoupper(substr($admin_user['full_name'], 0, 1) . substr(explode(' ', $admin_user['full_name'])[1] ?? '', 0, 1)); ?>
                 </div>
                 <div class="text-left">
-                    <p class="font-title-md text-sm font-bold text-on-surface leading-tight"><?php echo htmlspecialchars($admin_user['full_name']); ?></p>
+                    <p class="font-title-md text-sm font-bold text-on-surface leading-tight">
+                        <?php echo htmlspecialchars($admin_user['full_name']); ?></p>
                     <p class="text-[10px] text-outline uppercase tracking-wider">System Admin</p>
                 </div>
             </div>
@@ -247,11 +242,6 @@ $jobs_result = $jobs_query;
                     <p class="text-on-surface-variant font-body-lg">Oversee, track, and manage all active job vacancies
                         across the platform.</p>
                 </div>
-                <a href="post_job.php"
-                    class="bg-primary hover:bg-primary-container text-white px-6 py-3 rounded-lg font-bold flex items-center transition-all shadow-sm">
-                    <span class="material-symbols-outlined mr-2">add</span>
-                    Create New Job Posting
-                </a>
             </div>
             <!-- Metrics Bento Grid -->
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -264,7 +254,8 @@ $jobs_result = $jobs_query;
                         </div>
                     </div>
                     <p class="text-outline text-label-md uppercase tracking-widest font-bold">Total Active Jobs</p>
-                    <h3 class="text-display text-4xl font-black text-on-surface mt-1"><?php echo number_format($total_jobs); ?></h3>
+                    <h3 class="text-display text-4xl font-black text-on-surface mt-1">
+                        <?php echo number_format($total_jobs); ?></h3>
                 </div>
                 <!-- New Postings (Today) -->
                 <div
@@ -275,7 +266,8 @@ $jobs_result = $jobs_query;
                         </div>
                     </div>
                     <p class="text-outline text-label-md uppercase tracking-widest font-bold">New Postings (Today)</p>
-                    <h3 class="text-display text-4xl font-black text-on-surface mt-1"><?php echo number_format($new_today); ?></h3>
+                    <h3 class="text-display text-4xl font-black text-on-surface mt-1">
+                        <?php echo number_format($new_today); ?></h3>
                 </div>
                 <!-- Pending Approval -->
                 <div
@@ -304,46 +296,8 @@ $jobs_result = $jobs_query;
             <div
                 class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
-                    <div
-                        class="flex items-center border border-outline-variant rounded-lg px-3 py-2 bg-surface-container-lowest">
-                        <label class="text-xs font-bold text-outline uppercase mr-2">Industry:</label>
-                        <select class="border-none bg-transparent text-sm focus:ring-0 cursor-pointer font-medium p-0">
-                            <option>All Industries</option>
-                            <option>Technology</option>
-                            <option>Finance</option>
-                            <option>Healthcare</option>
-                        </select>
-                    </div>
-                    <div
-                        class="flex items-center border border-outline-variant rounded-lg px-3 py-2 bg-surface-container-lowest">
-                        <label class="text-xs font-bold text-outline uppercase mr-2">Status:</label>
-                        <select class="border-none bg-transparent text-sm focus:ring-0 cursor-pointer font-medium p-0">
-                            <option>All Status</option>
-                            <option>Active</option>
-                            <option>Pending</option>
-                            <option>Filled</option>
-                        </select>
-                    </div>
-                    <div
-                        class="flex items-center border border-outline-variant rounded-lg px-3 py-2 bg-surface-container-lowest">
-                        <label class="text-xs font-bold text-outline uppercase mr-2">Type:</label>
-                        <select class="border-none bg-transparent text-sm focus:ring-0 cursor-pointer font-medium p-0">
-                            <option>Full-time</option>
-                            <option>Contract</option>
-                            <option>Remote</option>
-                            <option>Hybrid</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button
-                        class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all">
-                        <span class="material-symbols-outlined">filter_list</span>
-                    </button>
-                    <button
-                        class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all">
-                        <span class="material-symbols-outlined">download</span>
-                    </button>
                 </div>
             </div>
             <!-- Data Table Section -->
@@ -364,53 +318,63 @@ $jobs_result = $jobs_query;
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant">
-                    <?php if ($jobs_result && $jobs_result->num_rows > 0):
-                        while ($job = $jobs_result->fetch_assoc()):
-                            $category = !empty($job['required_skills']) ? explode(',', $job['required_skills'])[0] : 'General';
-                            $date_posted = date('M d, Y', strtotime($job['created_at']));
-                            $applications_count = $job['applications_count'] ?? 0;
-                    ?>
-                        <tr class="hover:bg-surface-container-lowest transition-colors group">
-                            <td class="px-6 py-5">
-                                <p class="font-bold text-on-surface"><?php echo htmlspecialchars($job['title']); ?></p>
-                                <p class="text-xs text-outline"><?php echo htmlspecialchars($job['location']); ?></p>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-sm font-medium">
-                                        <?php echo strtoupper(substr($job['recruiter_name'] ?? 'N',0,1)); ?>
-                                    </div>
-                                    <span class="text-sm font-medium"><?php echo htmlspecialchars($job['recruiter_name'] ?? 'Unknown'); ?></span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <span class="bg-surface-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"><?php echo htmlspecialchars($category); ?></span>
-                            </td>
-                            <td class="px-6 py-5 text-sm text-on-surface-variant"><?php echo $date_posted; ?></td>
-                            <td class="px-6 py-5 text-center">
-                                <span class="font-bold text-primary"><?php echo number_format($applications_count); ?></span>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="flex items-center text-green-600 font-bold text-xs">
-                                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                    Active
-                                </div>
-                            </td>
-                            <td class="px-6 py-5 text-right">
-                                <div class="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <a href="view_job.php?id=<?php echo $job['job_id']; ?>" class="p-1.5 hover:text-primary transition-colors" title="View"><span class="material-symbols-outlined text-[20px]">visibility</span></a>
-                                    <a href="edit_job.php?id=<?php echo $job['job_id']; ?>" class="p-1.5 hover:text-primary transition-colors" title="Edit"><span class="material-symbols-outlined text-[20px]">edit</span></a>
-                                    <a href="#" onclick="if(confirm('Feature this job?')){ window.location='feature_job.php?id=<?php echo $job['job_id']; ?>'; } return false;" class="p-1.5 hover:text-primary transition-colors" title="Feature"><span class="material-symbols-outlined text-[20px]">star</span></a>
-                                    <a href="#" onclick="if(confirm('Archive this job?')){ window.location='archive_job.php?id=<?php echo $job['job_id']; ?>'; } return false;" class="p-1.5 hover:text-error transition-colors" title="Archive"><span class="material-symbols-outlined text-[20px]">archive</span></a>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php
-                        endwhile;
-                    else:
-                        echo '<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">No jobs found.</td></tr>';
-                    endif;
-                    ?>
+                        <?php if ($jobs_result && $jobs_result->num_rows > 0):
+                            while ($job = $jobs_result->fetch_assoc()):
+                                $category = !empty($job['required_skills']) ? explode(',', $job['required_skills'])[0] : 'General';
+                                $date_posted = date('M d, Y', strtotime($job['created_at']));
+                                $applications_count = $job['applications_count'] ?? 0;
+                                ?>
+                                <tr class="hover:bg-surface-container-lowest transition-colors group">
+                                    <td class="px-6 py-5">
+                                        <p class="font-bold text-on-surface"><?php echo htmlspecialchars($job['title']); ?></p>
+                                        <p class="text-xs text-outline"><?php echo htmlspecialchars($job['location']); ?></p>
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <div class="flex items-center space-x-3">
+                                            <div
+                                                class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-sm font-medium">
+                                                <?php echo strtoupper(substr($job['recruiter_name'] ?? 'N', 0, 1)); ?>
+                                            </div>
+                                            <span
+                                                class="text-sm font-medium"><?php echo htmlspecialchars($job['recruiter_name'] ?? 'Unknown'); ?></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <span
+                                            class="bg-surface-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"><?php echo htmlspecialchars($category); ?></span>
+                                    </td>
+                                    <td class="px-6 py-5 text-sm text-on-surface-variant"><?php echo $date_posted; ?></td>
+                                    <td class="px-6 py-5 text-center">
+                                        <span
+                                            class="font-bold text-primary"><?php echo number_format($applications_count); ?></span>
+                                    </td>
+                                    <td class="px-6 py-5">
+                                        <div class="flex items-center text-green-600 font-bold text-xs">
+                                            <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                            Active
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-5 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            <a href="view_job.php?id=<?php echo $job['job_id']; ?>"
+                                                class="p-1.5 hover:text-primary transition-colors" title="View"><span
+                                                    class="material-symbols-outlined text-[20px]">visibility</span></a>
+                                            <a href="edit_job.php?id=<?php echo $job['job_id']; ?>"
+                                                class="p-1.5 hover:text-primary transition-colors" title="Edit"><span
+                                                    class="material-symbols-outlined text-[20px]">edit</span></a>
+                                            <a href="#"
+                                                onclick="if(confirm('Delete this job?')){ window.location='delete_job.php?id=<?php echo $job['job_id']; ?>'; } return false;"
+                                                class="p-1.5 hover:text-error transition-colors" title="Delete"><span
+                                                    class="material-symbols-outlined text-[20px]">delete</span></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php
+                            endwhile;
+                        else:
+                            echo '<tr><td colspan="7" class="px-6 py-8 text-center text-on-surface-variant">No jobs found.</td></tr>';
+                        endif;
+                        ?>
                     </tbody>
                 </table>
                 <!-- Pagination -->
