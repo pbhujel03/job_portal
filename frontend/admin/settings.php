@@ -134,18 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                 }
             }
         }
-    } elseif ($active_tab === 'ai') {
-        $threshold = max(0, min(100, (int) ($_POST['screening_threshold'] ?? 75)));
-        $sensitivity = $_POST['ai_sensitivity'] ?? 'balanced';
-        if (!in_array($sensitivity, ['conservative', 'balanced', 'aggressive'], true)) {
-            $sensitivity = 'balanced';
-        }
-        save_settings_bulk($conn, [
-            'ai_sensitivity' => $sensitivity,
-            'screening_threshold' => (string) $threshold,
-            'llm_model' => $_POST['llm_model'] ?? 'recruitllm-v4',
-        ]);
-        $success_message = 'AI configuration saved successfully.';
     } elseif ($active_tab === 'security') {
         save_setting($conn, 'two_factor_enabled', isset($_POST['two_factor_enabled']) ? '1' : '0');
         $success_message = 'Security settings saved successfully.';
@@ -187,7 +175,7 @@ $timezones = [
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Settings | RecruitFlow Admin</title>
+    <title>Settings | Job Portal Admin</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet">
@@ -322,7 +310,7 @@ $timezones = [
     </script>
 </head>
 
-<body class="bg-surface text-on-surface overflow-hidden">
+<body class="bg-surface text-on-surface overflow-hidden h-screen flex flex-col">
     <!-- Sidebar Navigation Shell -->
     <aside class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
         <a href="dashboard.php" class="admin-sidebar-brand">
@@ -361,15 +349,7 @@ $timezones = [
     <!-- Top App Bar -->
     <header
         class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-desktop z-40">
-        <div class="flex items-center w-1/2">
-            <div class="relative w-full max-w-md group">
-                <span
-                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary">search</span>
-                <input
-                    class="w-full bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-body-md"
-                    placeholder="Search settings..." type="text">
-            </div>
-        </div>
+        <div></div>
         <div class="flex items-center space-x-6">
             <button
                 class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full relative">
@@ -388,8 +368,9 @@ $timezones = [
         </div>
     </header>
     <!-- Main Content Area -->
-    <main class="ml-64 flex-1 min-h-screen bg-surface relative flex flex-col pt-16 overflow-y-auto">
-        <div class="max-w-[1600px] mx-auto p-margin-desktop">
+    <main class="ml-64 flex-1 pt-16 bg-surface relative overflow-hidden flex flex-col">
+        <div class="flex-1 overflow-y-auto pb-32">
+            <div class="max-w-[1600px] mx-auto p-margin-desktop">
             <header class="mb-xl">
                 <h2 class="font-headline-lg text-headline-lg text-on-surface">System Settings</h2>
                 <p class="text-on-surface-variant font-body-md text-body-md">Manage your organization's configurations,
@@ -425,12 +406,6 @@ $timezones = [
                         id="tab-account" onclick="switchTab('account')">
                         <span class="material-symbols-outlined mr-3">account_circle</span>
                         <span class="font-body-md text-body-md font-medium">Account &amp; Profile</span>
-                    </button>
-                    <button type="button"
-                        class="nav-btn w-full flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container transition-all"
-                        id="tab-ai" onclick="switchTab('ai')">
-                        <span class="material-symbols-outlined mr-3">neurology</span>
-                        <span class="font-body-md text-body-md font-medium">AI Configuration</span>
                     </button>
                     <button type="button"
                         class="nav-btn w-full flex items-center px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container transition-all"
@@ -567,74 +542,6 @@ $timezones = [
                             </div>
                         </div>
                     </section>
-                    <!-- Section: AI Configuration -->
-                    <section class="settings-section hidden space-y-6" id="content-ai">
-                        <div
-                            class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg shadow-sm">
-                            <div
-                                class="flex items-center justify-between mb-lg border-b border-outline-variant/20 pb-md">
-                                <h3 class="font-title-md text-title-md text-on-surface">Resume Intelligence</h3>
-                                <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
-                                    <span class="material-symbols-outlined text-primary text-sm"
-                                        style="font-variation-settings: 'FILL' 1;">bolt</span>
-                                    <span
-                                        class="text-[10px] font-bold text-primary uppercase tracking-widest">Active</span>
-                                </div>
-                            </div>
-                            <div class="space-y-lg">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="font-body-md text-on-surface font-semibold">AI Sensitivity Level</p>
-                                        <p class="text-sm text-on-surface-variant">Adjust how strictly the AI matches
-                                            candidate skills to job descriptions.</p>
-                                    </div>
-                                    <div class="flex items-center gap-4 bg-surface-container-low p-1 rounded-lg">
-                                        <?php
-                                        $sensitivities = ['conservative' => 'Conservative', 'balanced' => 'Balanced', 'aggressive' => 'Aggressive'];
-                                        foreach ($sensitivities as $value => $label):
-                                            $active = $settings['ai_sensitivity'] === $value;
-                                        ?>
-                                        <label class="px-4 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer <?php echo $active ? 'bg-white shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'; ?>">
-                                            <input type="radio" name="ai_sensitivity" value="<?php echo $value; ?>" class="sr-only" <?php echo $active ? 'checked' : ''; ?>>
-                                            <?php echo $label; ?>
-                                        </label>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <div class="border-t border-outline-variant/20 pt-lg">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-body-md text-on-surface font-semibold">Automated Screening
-                                                Threshold</p>
-                                            <p class="text-sm text-on-surface-variant">Candidates scoring below this
-                                                value will be automatically declined.</p>
-                                        </div>
-                                        <div class="flex items-center gap-3">
-                                            <input name="screening_threshold" id="screening_threshold" class="w-48 accent-primary" max="100" min="0" type="range"
-                                                value="<?php echo (int) $settings['screening_threshold']; ?>" oninput="document.getElementById('threshold_label').textContent = this.value + '%'">
-                                            <span id="threshold_label" class="font-bold text-primary w-10 text-right"><?php echo (int) $settings['screening_threshold']; ?>%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="border-t border-outline-variant/20 pt-lg">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-body-md text-on-surface font-semibold">LLM Model Selection
-                                            </p>
-                                            <p class="text-sm text-on-surface-variant">Switch between performance levels
-                                                for complex analysis.</p>
-                                        </div>
-                                        <select name="llm_model"
-                                            class="bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/20 outline-none">
-                                            <option value="recruitllm-v4" <?php echo $settings['llm_model'] === 'recruitllm-v4' ? 'selected' : ''; ?>>RecruitLLM-v4 (Optimized)</option>
-                                            <option value="gpt-4o" <?php echo $settings['llm_model'] === 'gpt-4o' ? 'selected' : ''; ?>>GPT-4o (Enhanced Reasoning)</option>
-                                            <option value="claude-3.5-sonnet" <?php echo $settings['llm_model'] === 'claude-3.5-sonnet' ? 'selected' : ''; ?>>Claude 3.5 Sonnet</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
                     <!-- Section: Security & Access -->
                     <section class="settings-section hidden space-y-6" id="content-security">
                         <div
@@ -689,13 +596,13 @@ $timezones = [
                     </section>
                 </div>
             </form>
+            </div>
         </div>
     </main>
     <!-- Fixed Action Footer -->
-    <div class="fixed bottom-0 right-0 w-full pl-64 z-50">
+    <div class="fixed bottom-0 left-64 right-0 z-50 bg-white/80 backdrop-blur-md border-t border-outline-variant/30">
         <div class="max-w-[1600px] mx-auto px-margin-desktop py-6">
-            <div
-                class="bg-white/80 backdrop-blur-md border border-outline-variant/30 rounded-2xl p-4 flex items-center justify-between shadow-2xl">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3 ml-4 text-on-surface-variant">
                     <span class="material-symbols-outlined text-primary"
                         style="font-variation-settings: 'FILL' 1;">info</span>

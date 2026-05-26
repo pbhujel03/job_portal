@@ -49,9 +49,15 @@ if (!empty($search_query)) {
 $where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
 
 // Fetch users
-$users_query = "SELECT user_id, full_name, email, role, created_at FROM users $where_clause ORDER BY created_at DESC";
+$per_page = 10;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $per_page;
+
+$total_matching_result = $conn->query("SELECT COUNT(*) as count FROM users $where_clause");
+$total_matching = $total_matching_result ? (int)$total_matching_result->fetch_assoc()['count'] : 0;
+
+$users_query = "SELECT user_id, full_name, email, role, created_at FROM users $where_clause ORDER BY created_at DESC LIMIT $offset, $per_page";
 $users_result = $conn->query($users_query);
-$total_users = $users_result->num_rows;
 
 // Count statistics
 $total_users_count = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
@@ -224,13 +230,7 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
         <!-- TopAppBar Shell -->
         <header
             class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-desktop z-40">
-            <div
-                class="flex items-center bg-surface-container-low rounded-full px-4 py-2 w-96 border border-outline-variant/30">
-                <span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
-                <input
-                    class="bg-transparent border-none focus:ring-0 text-body-md font-body-md w-full placeholder-on-surface-variant/60"
-                    placeholder="Search for anything..." type="text">
-            </div>
+            <div></div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-3 cursor-pointer group">
                     <div
@@ -445,28 +445,40 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                     </table>
                 </div>
                 <!-- Pagination -->
-                <div
-                    class="px-lg py-4 bg-surface-container-lowest border-t border-outline-variant/20 flex items-center justify-between">
-                    <p class="font-label-md text-label-md text-on-surface-variant">Showing 1-10 of 14,234 users</p>
+                <div class="px-lg py-4 bg-surface-container-lowest border-t border-outline-variant/20 flex items-center justify-between">
+                    <?php
+                    $total = $total_matching;
+                    $start = ($total > 0) ? $offset + 1 : 0;
+                    $end = ($total > 0) ? min($offset + $per_page, $total) : 0;
+                    $last_page = ($per_page > 0) ? (int) ceil($total / $per_page) : 1;
+                    $base_params = [];
+                    if (!empty($selected_role)) $base_params['role'] = $selected_role;
+                    if (!empty($search_query)) $base_params['search'] = $search_query;
+                    $build_url = function($page_num) use ($base_params) {
+                        $params = $base_params;
+                        $params['page'] = $page_num;
+                        return 'manage_users.php?' . http_build_query($params);
+                    };
+                    ?>
+                    <p class="font-label-md text-label-md text-on-surface-variant">Showing <?php echo $start; ?>–<?php echo $end; ?> of <?php echo number_format($total); ?> users</p>
                     <div class="flex items-center gap-1">
-                        <button
-                            class="p-2 border border-outline-variant rounded-md hover:bg-surface-container-low disabled:opacity-50 transition-all"
-                            disabled="">
+                        <a href="<?php echo ($page > 1) ? $build_url($page - 1) : '#'; ?>" class="p-2 border border-outline-variant rounded-md hover:bg-surface-container-low disabled:opacity-50 transition-all <?php echo ($page <= 1) ? 'opacity-50 pointer-events-none' : ''; ?>">
                             <span class="material-symbols-outlined text-sm">chevron_left</span>
-                        </button>
-                        <button
-                            class="px-3 py-1 bg-primary text-white rounded-md font-label-md text-label-md">1</button>
-                        <button
-                            class="px-3 py-1 hover:bg-surface-container-low rounded-md font-label-md text-label-md text-on-surface-variant">2</button>
-                        <button
-                            class="px-3 py-1 hover:bg-surface-container-low rounded-md font-label-md text-label-md text-on-surface-variant">3</button>
-                        <span class="px-2 text-on-surface-variant">...</span>
-                        <button
-                            class="px-3 py-1 hover:bg-surface-container-low rounded-md font-label-md text-label-md text-on-surface-variant">1,423</button>
-                        <button
-                            class="p-2 border border-outline-variant rounded-md hover:bg-surface-container-low transition-all">
+                        </a>
+                        <a href="<?php echo $build_url(1); ?>" class="px-3 py-1 <?php echo ($page == 1) ? 'bg-primary text-white rounded-md' : 'hover:bg-surface-container-low rounded-md'; ?> font-label-md text-label-md">1</a>
+                        <?php if ($page > 2): ?>
+                            <span class="px-2 text-on-surface-variant">...</span>
+                        <?php endif; ?>
+                        <?php if ($page > 1): ?>
+                            <a href="<?php echo $build_url($page); ?>" class="px-3 py-1 bg-primary text-white rounded-md font-label-md text-label-md"><?php echo $page; ?></a>
+                        <?php endif; ?>
+                        <?php if ($page < $last_page - 1): ?>
+                            <span class="px-2 text-on-surface-variant">...</span>
+                        <?php endif; ?>
+                        <a href="<?php echo $build_url($last_page); ?>" class="px-3 py-1 hover:bg-surface-container-low rounded-md font-label-md text-label-md text-on-surface-variant"><?php echo $last_page; ?></a>
+                        <a href="<?php echo ($page < $last_page) ? $build_url($page + 1) : '#'; ?>" class="p-2 border border-outline-variant rounded-md hover:bg-surface-container-low transition-all <?php echo ($page >= $last_page) ? 'opacity-50 pointer-events-none' : ''; ?>">
                             <span class="material-symbols-outlined text-sm">chevron_right</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -474,7 +486,7 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
         <!-- Standard Footer -->
         <footer
             class="mt-auto px-margin-desktop py-lg border-t border-outline-variant bg-surface flex justify-between items-center text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
-            <p class="">© 2024 RecruitFlow Intelligence. All rights reserved.</p>
+            <p class="">© 2024 Job Portal. All rights reserved.</p>
             <div class="flex gap-lg">
                 <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
                 <a class="hover:text-primary transition-colors" href="#">Security Audit</a>

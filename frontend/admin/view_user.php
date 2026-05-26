@@ -39,7 +39,7 @@ $role_display = $user['role'] === 'job_seeker' ? 'Candidate' : ($user['role'] ==
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>View User | RecruitFlow</title>
+    <title>View User | Job Portal</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
@@ -147,7 +147,7 @@ $role_display = $user['role'] === 'job_seeker' ? 'Candidate' : ($user['role'] ==
             </div>
         </div>
         <footer class="mt-auto px-margin-desktop py-lg border-t border-outline-variant bg-surface flex justify-between items-center text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
-            <p>© 2024 RecruitFlow Intelligence. All rights reserved.</p>
+            <p>© 2024 Job Portal. All rights reserved.</p>
             <div class="flex gap-lg"><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a><a class="hover:text-primary transition-colors" href="#">Support</a></div>
         </footer>
     </main>

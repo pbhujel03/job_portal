@@ -25,19 +25,58 @@ if ($_SESSION['user_id'] == 0) {
     $admin_user = $admin_result->fetch_assoc();
 }
 
+// Get search query from URL parameter
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$selected_location = isset($_GET['location']) ? $_GET['location'] : '';
+$selected_status = isset($_GET['status']) ? $_GET['status'] : '';
+
 // Fetch job statistics
 $total_jobs = $conn->query("SELECT COUNT(*) as count FROM jobs")->fetch_assoc()['count'];
 $new_today = $conn->query("SELECT COUNT(*) as count FROM jobs WHERE DATE(created_at) = CURDATE()")->fetch_assoc()['count'];
 
-// Fetch all jobs
+// Build query based on filters
+$where_conditions = [];
+
+if (!empty($search_query)) {
+    $search_escaped = $conn->real_escape_string($search_query);
+    $where_conditions[] = "(j.title LIKE '%$search_escaped%' OR j.description LIKE '%$search_escaped%' OR j.location LIKE '%$search_escaped%')";
+}
+
+if (!empty($selected_location)) {
+    $location_escaped = $conn->real_escape_string($selected_location);
+    $where_conditions[] = "j.location = '$location_escaped'";
+}
+
+$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
+
+// Get unique locations for filter
+$locations_result = $conn->query("SELECT DISTINCT location FROM jobs WHERE location IS NOT NULL AND location != '' ORDER BY location ASC");
+$locations = [];
+if ($locations_result) {
+    while ($row = $locations_result->fetch_assoc()) {
+        $locations[] = $row['location'];
+    }
+}
+
+// Pagination for jobs
+$per_page = 10;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $per_page;
+
+$total_matching_result = $conn->query("SELECT COUNT(*) as count FROM jobs j $where_clause");
+$total_matching_jobs = $total_matching_result ? (int)$total_matching_result->fetch_assoc()['count'] : 0;
+
+// Fetch paginated jobs
 $jobs_query = $conn->query("
     SELECT j.job_id, j.title, j.description, j.required_skills, u.full_name as recruiter_name, j.location, j.salary, 
            j.created_at, COUNT(a.application_id) as applications_count
     FROM jobs j
     LEFT JOIN users u ON j.recruiter_id = u.user_id
     LEFT JOIN applications a ON j.job_id = a.job_id
-    GROUP BY j.job_id
+    $where_clause
+    GROUP BY j.job_id, j.title, j.description, j.required_skills, j.location, j.salary, j.created_at, u.full_name
     ORDER BY j.created_at DESC
+    LIMIT $offset, $per_page
 ");
 $jobs_result = $jobs_query;
 ?>
@@ -48,7 +87,7 @@ $jobs_result = $jobs_query;
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>RecruitFlow Admin - Job Management</title>
+    <title>Job Portal Admin - Job Management</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet" />
@@ -209,15 +248,7 @@ $jobs_result = $jobs_query;
     <!-- TopAppBar Shell -->
     <header
         class="flex justify-between items-center h-16 w-full pl-72 pr-10 z-40 bg-white fixed top-0 border-b border-outline-variant dark:border-outline">
-        <div class="flex items-center flex-1 max-w-xl">
-            <div class="relative w-full">
-                <span
-                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-                <input
-                    class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-body-md"
-                    placeholder="Search job titles, companies, or categories..." type="text" />
-            </div>
-        </div>
+        <div></div>
         <div class="flex items-center space-x-6">
             <div class="flex items-center space-x-3 ml-4">
                 <div
@@ -295,10 +326,33 @@ $jobs_result = $jobs_query;
             <!-- Table Controls -->
             <div
                 class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center space-x-4">
+                <div class="flex gap-3 items-center">
+                    <div class="relative">
+                        <select onchange="window.location.href='?location=' + this.value"
+                            class="appearance-none pl-4 pr-10 py-2 bg-white border border-outline-variant rounded-lg text-body-md font-body-md focus:ring-primary focus:border-primary cursor-pointer">
+                            <option value="">All Locations</option>
+                            <?php foreach ($locations as $location): ?>
+                                <option value="<?php echo htmlspecialchars($location); ?>" <?php echo ($selected_location === $location) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($location); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-sm">expand_more</span>
+                    </div>
+                    <a href="manage_jobs.php"
+                        class="px-4 py-2 text-primary font-label-md text-label-md font-bold hover:bg-primary/5 rounded-lg transition-all">Clear
+                        Filters</a>
                 </div>
-                <div class="flex items-center space-x-2">
-                </div>
+                <form method="get" class="relative w-72">
+                    <input type="hidden" name="location" value="<?php echo htmlspecialchars($selected_location); ?>">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm">search</span>
+                    <input
+                        name="search"
+                        class="pl-10 pr-4 py-2 w-full border border-outline-variant rounded-lg text-body-md font-body-md focus:ring-primary focus:border-primary"
+                        placeholder="Search Jobs..." type="text" value="<?php echo htmlspecialchars($search_query); ?>" onchange="this.form.submit()">
+                </form>
             </div>
             <!-- Data Table Section -->
             <div class="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
@@ -378,25 +432,32 @@ $jobs_result = $jobs_query;
                     </tbody>
                 </table>
                 <!-- Pagination -->
-                <div
-                    class="px-6 py-4 bg-surface-container-low flex justify-between items-center border-t border-outline-variant">
-                    <p class="text-xs font-medium text-on-surface-variant">Showing <span class="font-bold">1</span> to
-                        <span class="font-bold">4</span> of <span class="font-bold">1,284</span> postings
+                <div class="px-6 py-4 bg-surface-container-low flex justify-between items-center border-t border-outline-variant">
+                    <?php
+                    $total = $total_matching_jobs;
+                    $start = ($total > 0) ? $offset + 1 : 0;
+                    $end = ($total > 0) ? min($offset + $per_page, $total) : 0;
+                    $last_page = ($per_page > 0) ? (int) ceil($total / $per_page) : 1;
+                    $base_params = [];
+                    if (!empty($selected_location)) $base_params['location'] = $selected_location;
+                    if (!empty($search_query)) $base_params['search'] = $search_query;
+                    $build_url = function($page_num) use ($base_params) {
+                        $params = $base_params;
+                        $params['page'] = $page_num;
+                        return 'manage_jobs.php?' . http_build_query($params);
+                    };
+                    ?>
+                    <p class="text-xs font-medium text-on-surface-variant">Showing <span class="font-bold"><?php echo $start; ?></span> to
+                        <span class="font-bold"><?php echo $end; ?></span> of <span class="font-bold"><?php echo number_format($total); ?></span> postings
                     </p>
                     <div class="flex space-x-1">
-                        <button
-                            class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all">Previous</button>
-                        <button
-                            class="px-3 py-1 border border-primary rounded bg-primary text-white text-xs font-bold">1</button>
-                        <button
-                            class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all">2</button>
-                        <button
-                            class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all">3</button>
-                        <span class="px-2 py-1 text-xs">...</span>
-                        <button
-                            class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all">128</button>
-                        <button
-                            class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all">Next</button>
+                        <a href="<?php echo ($page > 1) ? $build_url($page - 1) : '#'; ?>" class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all <?php echo ($page <= 1) ? 'opacity-50 pointer-events-none' : ''; ?>">Previous</a>
+                        <a href="<?php echo $build_url(1); ?>" class="px-3 py-1 border <?php echo ($page == 1) ? 'border-primary bg-primary text-white' : 'border-outline-variant bg-white'; ?> rounded text-xs font-bold">1</a>
+                        <?php if ($page > 2): ?><span class="px-2 py-1 text-xs">...</span><?php endif; ?>
+                        <?php if ($page > 1): ?><a href="<?php echo $build_url($page); ?>" class="px-3 py-1 border border-primary rounded bg-primary text-white text-xs font-bold"><?php echo $page; ?></a><?php endif; ?>
+                        <?php if ($page < $last_page - 1): ?><span class="px-2 py-1 text-xs">...</span><?php endif; ?>
+                        <a href="<?php echo $build_url($last_page); ?>" class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all"><?php echo $last_page; ?></a>
+                        <a href="<?php echo ($page < $last_page) ? $build_url($page + 1) : '#'; ?>" class="px-3 py-1 border border-outline-variant rounded bg-white text-xs font-bold hover:bg-surface-container transition-all <?php echo ($page >= $last_page) ? 'opacity-50 pointer-events-none' : ''; ?>">Next</a>
                     </div>
                 </div>
             </div>

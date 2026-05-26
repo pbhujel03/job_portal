@@ -106,7 +106,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>RecruitFlow Admin Console</title>
+    <title>Job Portal Admin Console</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
@@ -275,18 +275,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
         <!-- TopNavBar Component -->
         <header
             class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-desktop z-40">
-            <div class="flex items-center gap-lg flex-1">
-                <form action="" method="GET" class="w-full max-w-md">
-                    <div
-                        class="relative focus-within:ring-2 focus-within:ring-primary rounded-full bg-surface-container-low transition-all">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
-                            data-icon="search">search</span>
-                        <input class="w-full bg-transparent border-none focus:ring-0 py-2 pl-10 pr-4 text-body-md"
-                            placeholder="Search for jobs, recruiters, or candidates..." type="text" name="search"
-                            value="<?php echo htmlspecialchars($search_query); ?>">
-                    </div>
-                </form>
-            </div>
+            <div></div>
             <div class="flex items-center gap-md">
                 <div class="flex items-center gap-sm">
                     <div
@@ -547,7 +536,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
         <!-- System Footer -->
         <footer
             class="mt-auto px-margin-desktop py-lg border-t border-outline-variant bg-surface flex justify-between items-center text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
-            <p class="">© 2024 RecruitFlow Intelligence. All rights reserved.</p>
+            <p class="">© 2024 Job Portal. All rights reserved.</p>
             <div class="flex gap-lg">
                 <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
                 <a class="hover:text-primary transition-colors" href="#">Security Audit</a>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>RecruitFlow - Job Seeker Dashboard</title>
+    <title>Job Portal - Job Seeker Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
         rel="stylesheet">
@@ -613,7 +613,7 @@
         <!-- System Footer -->
         <footer
             class="mt-auto px-margin-desktop py-lg border-t border-outline-variant bg-surface flex flex-col md:flex-row justify-between items-center text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
-            <p class="">© 2024 RecruitFlow Intelligence. All rights reserved.</p>
+            <p class="">© 2024 Job Portal. All rights reserved.</p>
             <div class="flex gap-lg mt-4 md:mt-0">
                 <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
                 <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
