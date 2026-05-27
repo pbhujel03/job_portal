@@ -55,7 +55,7 @@ if (!$job) {
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Edit Job | Job Portal</title>
+    <title>Edit Job | Job Portal Admin</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
@@ -64,7 +64,7 @@ if (!$job) {
     <script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-primary-fixed":"#0f0069","inverse-on-surface":"#eaf1ff","secondary-container":"#dae2fd","secondary":"#565e74","on-tertiary-fixed-variant":"#7b2f00","on-error":"#ffffff","surface-variant":"#d3e4fe","on-secondary-fixed-variant":"#3f465c","primary-fixed":"#e2dfff","on-secondary":"#ffffff","surface":"#f8f9ff","surface-tint":"#4d44e3","error":"#ba1a1a","tertiary":"#7e3000","primary-container":"#4f46e5","on-surface-variant":"#464555","on-primary":"#ffffff","inverse-surface":"#213145","tertiary-fixed":"#ffdbcc","on-primary-fixed-variant":"#3323cc","on-primary-container":"#dad7ff","surface-container-high":"#dce9ff","on-background":"#0b1c30","primary":"#3525cd","surface-container-lowest":"#ffffff","on-tertiary-container":"#ffd2be","tertiary-container":"#a44100","on-secondary-container":"#5c647a","surface-bright":"#f8f9ff","secondary-fixed-dim":"#bec6e0","on-error-container":"#93000a","surface-container-low":"#eff4ff","on-surface":"#0b1c30","on-tertiary":"#ffffff","secondary-fixed":"#dae2fd","on-tertiary-fixed":"#351000","inverse-primary":"#c3c0ff","surface-container-highest":"#d3e4fe","outline":"#777587","tertiary-fixed-dim":"#ffb695","surface-container":"#e5eeff","on-secondary-fixed":"#131b2e","surface-dim":"#cbdbf5","error-container":"#ffdad6","primary-fixed-dim":"#c3c0ff","outline-variant":"#c7c4d8","background":"#f8f9ff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"xl":"32px","margin-mobile":"16px","gutter":"24px","lg":"24px","base":"8px","xs":"4px","sm":"8px","margin-desktop":"40px","md":"16px"},"fontFamily":{"body-md":["Inter"],"headline-lg":["Inter"],"display":["Inter"],"body-lg":["Inter"],"label-md":["Inter"],"title-md":["Inter"]},"fontSize":{"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"600"}],"display":["56px",{"lineHeight":"64px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"500"}],"title-md":["20px",{"lineHeight":"28px","fontWeight":"600"}]}}}}</script>
     <style>body{font-family:'Inter',sans-serif}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}.custom-scrollbar::-webkit-scrollbar{width:4px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:10px}</style>
 </head>
-<body class="bg-surface text-on-surface min-h-screen flex">
+<body class="bg-surface text-on-surface min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
     <aside class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
         <a href="dashboard.php" class="admin-sidebar-brand">
             <img src="../assets/images/Job1.png" alt="" class="admin-sidebar-brand__icon">
@@ -111,9 +111,13 @@ if (!$job) {
                     </div>
                     <div class="hidden lg:block text-left">
                         <p class="font-body-md font-bold text-on-surface"><?php echo htmlspecialchars($admin_user['full_name']); ?></p>
-                        <p class="text-[10px] text-on-surface-variant">System Admin</p>
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">System Admin</p>
                     </div>
                 </div>
+                <div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+                <a href="../public/logout.php" class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full" title="Logout">
+                    <span class="material-symbols-outlined">logout</span>
+                </a>
             </div>
         </header>
         <div class="flex-1 p-margin-desktop space-y-xl pt-16">
@@ -160,7 +164,11 @@ if (!$job) {
         </div>
         <footer class="mt-auto px-margin-desktop py-lg border-t border-outline-variant bg-surface flex justify-between items-center text-[10px] text-on-surface-variant uppercase tracking-widest font-bold">
             <p>© 2024 Job Portal. All rights reserved.</p>
-            <div class="flex gap-lg"><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a><a class="hover:text-primary transition-colors" href="#">Support</a></div>
+            <div class="flex gap-lg">
+                <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+                <a class="hover:text-primary transition-colors" href="#">Security Audit</a>
+                <a class="hover:text-primary transition-colors" href="#">Support Desk</a>
+            </div>
         </footer>
     </main>
 </body>

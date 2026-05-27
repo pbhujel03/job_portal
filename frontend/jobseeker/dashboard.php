@@ -1,3 +1,41 @@
+<?php
+session_start();
+include '../../backend/config/db.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'job_seeker') {
+    header('Location: ../public/login.php');
+    exit;
+}
+
+// Get user data
+$user_id = $_SESSION['user_id'];
+$user_query = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+$user_query->bind_param("i", $user_id);
+$user_query->execute();
+$user_data = $user_query->get_result()->fetch_assoc();
+$user_query->close();
+
+// Get total jobs available
+$total_jobs_result = $conn->query("SELECT COUNT(*) as count FROM jobs");
+$total_jobs = $total_jobs_result->fetch_assoc()['count'];
+
+// Get jobs applied
+$applied_jobs_result = $conn->query("SELECT COUNT(*) as count FROM applications WHERE seeker_id = $user_id");
+$applied_jobs = $applied_jobs_result->fetch_assoc()['count'];
+
+// Get shortlisted count
+$shortlisted_result = $conn->query("SELECT COUNT(*) as count FROM applications WHERE seeker_id = $user_id AND status = 'shortlisted'");
+$shortlisted = $shortlisted_result->fetch_assoc()['count'];
+
+// Get notifications (shortlisted or approved)
+$notifications_result = $conn->query("SELECT COUNT(*) as count FROM applications WHERE seeker_id = $user_id AND (status = 'shortlisted' OR status = 'approved')");
+$notification_count = $notifications_result->fetch_assoc()['count'];
+
+$profile_image = !empty($user_data['profile_image']) 
+    ? '../' . ltrim($user_data['profile_image'], '/') 
+    : 'https://ui-avatars.com/api/?name=' . urlencode($user_data['full_name']) . '&background=4f46e5&color=fff&size=128';
+?>
 <!DOCTYPE html>
 <html class="light" lang="en">
 
@@ -150,7 +188,7 @@
                 <span class="font-body-md text-body-md">Dashboard</span>
             </a>
             <a class="flex items-center gap-md text-secondary-fixed-dim hover:text-surface-bright hover:bg-primary/10 transition-colors duration-200 px-md py-base rounded-lg"
-                href="#">
+                href="browse_job.php">
                 <span class="material-symbols-outlined" data-icon="work">work</span>
                 <span class="font-body-md text-body-md">Available Jobs</span>
             </a>
@@ -186,7 +224,7 @@
                 <span class="font-body-md text-body-md">Profile Settings</span>
             </a>
             <a class="flex items-center gap-md text-error/80 hover:bg-error/10 transition-all duration-200 px-md py-base rounded-lg"
-                href="#">
+                href="../public/logout.php">
                 <span class="material-symbols-outlined" data-icon="logout">logout</span>
                 <span class="font-body-md text-body-md">Logout</span>
             </a>
@@ -207,25 +245,44 @@
                         placeholder="Search for jobs, companies, or skills..." type="text">
                 </div>
             </div>
-            <div class="flex items-center gap-md">
+            <div class="flex items-center gap-md relative">
+                <!-- Notification Button -->
                 <button
-                    class="hover:bg-surface-container-low rounded-full p-2 text-on-surface-variant transition-colors relative">
+                    class="hover:bg-surface-container-low rounded-full p-2 text-on-surface-variant transition-colors relative"
+                    title="Notifications">
                     <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
-                </button>
-                <button
-                    class="hover:bg-surface-container-low rounded-full p-2 text-on-surface-variant transition-colors">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    <?php if ($notification_count > 0): ?>
+                    <span class="absolute top-1 right-1 w-5 h-5 bg-error rounded-full border-2 border-white flex items-center justify-center">
+                        <span class="text-[10px] font-bold text-white"><?php echo min($notification_count, 9); ?><?php echo $notification_count > 9 ? '+' : ''; ?></span>
+                    </span>
+                    <?php endif; ?>
                 </button>
                 <div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
-                <div class="flex items-center gap-sm cursor-pointer group">
-                    <div class="hidden lg:block text-right">
-                        <p class="font-body-md font-bold text-on-surface">Alex Rivera</p>
-                        <p class="text-[10px] text-on-surface-variant">Pro Seeker</p>
+                <!-- User Profile Dropdown -->
+                <div class="relative group">
+                    <div class="flex items-center gap-sm cursor-pointer p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+                        <div class="hidden lg:block text-right">
+                            <p class="font-body-md font-bold text-on-surface"><?php echo htmlspecialchars($user_data['full_name']); ?></p>
+                            <p class="text-[10px] text-on-surface-variant">ID: <?php echo $user_id; ?></p>
+                        </div>
+                        <img alt="Profile"
+                            class="w-10 h-10 rounded-full border-2 border-primary-container/20 group-hover:border-primary-container transition-all object-cover"
+                            src="<?php echo htmlspecialchars($profile_image); ?>">
                     </div>
-                    <img alt="Profile"
-                        class="w-10 h-10 rounded-full border-2 border-primary-container/20 group-hover:border-primary-container transition-all object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSvLlLEVxvK5JIoZcNAPZw6XyU4KMbBVNPp2LFyYGtNTHbfGjtbznyHjKd2AN14ELKNcI3yb3Od9eruhjTxkoPU2gWMDjR_yArISMBg-oZlxN4DpkVVaCjEmbKJCbJ2CBOqysj8QboBGLC6IZ4183lAbJYDPRmNFde8jl6mDe2FqaiHUT1OjMUne4kRVXgEpeGsfE3oo_Uc_k1Kxg97TPflky-8m_dT288GCaQp7EQd2p22vgb2scW905O2YoJ6s9HApTvnZq2EEQ">
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div class="p-md border-b border-outline-variant/10">
+                            <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Account</p>
+                        </div>
+                        <a href="#" class="flex items-center gap-md px-lg py-md text-on-surface hover:bg-surface-container-low transition-colors text-sm">
+                            <span class="material-symbols-outlined text-[20px]">person</span>
+                            <span>Profile Settings</span>
+                        </a>
+                        <a href="../public/logout.php" class="flex items-center gap-md px-lg py-md text-error hover:bg-error/10 transition-colors text-sm">
+                            <span class="material-symbols-outlined text-[20px]">logout</span>
+                            <span>Logout</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -236,12 +293,8 @@
                 <div
                     class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-sm flex items-center justify-between hover:border-primary transition-colors group">
                     <div>
-                        <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Total
-                            Jobs Available</p>
-                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">1,240</h3>
-                        <p class="text-primary font-label-md text-label-md flex items-center mt-2">
-                            <span class="material-symbols-outlined text-sm mr-1">trending_up</span> +8% new
-                        </p>
+                        <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Total Jobs Available</p>
+                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo $total_jobs; ?></h3>
                     </div>
                     <div
                         class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -252,12 +305,8 @@
                 <div
                     class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-sm flex items-center justify-between hover:border-primary transition-colors group">
                     <div>
-                        <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Jobs
-                            Applied</p>
-                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">12</h3>
-                        <p class="text-secondary font-label-md text-label-md flex items-center mt-2">
-                            <span class="material-symbols-outlined text-sm mr-1">history</span> Last 30d
-                        </p>
+                        <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Jobs Applied</p>
+                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo $applied_jobs; ?></h3>
                     </div>
                     <div
                         class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
@@ -287,10 +336,7 @@
                     <div>
                         <p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
                             Shortlisted</p>
-                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1">03</h3>
-                        <p class="text-tertiary font-label-md text-label-md flex items-center mt-2">
-                            <span class="material-symbols-outlined text-sm mr-1">star</span> 3 active
-                        </p>
+                        <h3 class="text-display font-display text-[32px] font-extrabold text-on-surface mt-1"><?php echo $shortlisted; ?></h3>
                     </div>
                     <div
                         class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
@@ -301,160 +347,66 @@
             </div>
             <!-- Main Section: Available Jobs -->
             <div class="lg:col-span-8 space-y-lg">
-                <div class="flex justify-between items-center">
-                    <h2 class="font-headline-lg text-headline-lg text-on-surface">Available Jobs for You</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-on-surface-variant font-medium">Sort by:</span>
-                        <div class="relative">
-                            <select
-                                class="appearance-none pl-3 pr-8 py-1.5 bg-white border border-outline-variant rounded-lg text-xs font-bold text-primary focus:ring-primary/20 cursor-pointer">
-                                <option>Relevance</option>
-                                <option>Newest</option>
-                                <option>Salary</option>
-                            </select>
-                            <span
-                                class="material-symbols-outlined absolute right-2 top-1.5 text-primary pointer-events-none text-sm">keyboard_arrow_down</span>
-                        </div>
-                    </div>
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface mb-md">Available Jobs for You</h2>
                 </div>
-                <!-- Job Card 1 -->
-                <div
-                    class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-sm hover:shadow-md transition-all group">
+                <!-- PHP Loop for Database Jobs -->
+                <?php
+                $jobs_query = $conn->query("SELECT j.job_id, j.title, j.description, j.experience_required, j.salary, j.location, u.full_name 
+                                           FROM jobs j 
+                                           JOIN users u ON j.recruiter_id = u.user_id 
+                                           ORDER BY j.created_at DESC LIMIT 5");
+                
+                if ($jobs_query && $jobs_query->num_rows > 0):
+                    while ($job = $jobs_query->fetch_assoc()):
+                ?>
+                <div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-sm hover:shadow-md transition-all">
                     <div class="flex items-start gap-lg">
-                        <img alt="Nexus Tech"
-                            class="w-16 h-16 rounded-xl object-contain border border-outline-variant/50 bg-surface-container-low p-2 group-hover:border-primary/50 transition-colors"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuClqcJCz3UWW8ooLw6_K4-ZE0Nxppk457USCkAuJ208EwyXdnD6i_HbPDxqodV06coQbq9TzIgbJ7fQCZG5oRgPP4SpHF1pL4AaazaE4_tAVMaFf05SP1AnSkh0U_zsbnfMWv-obvtmi0zs7h9B5X3nSpuA7q7Q5MF2ThXi1dDt9ddg2TXfzyxGCi2YCgvINt0u18TExmC0IZdl4X68imuW82MuFDVQkdo9ScEZjdhbn77IHI2jFIXM9NKnoR0T0EoG_TNpefYorXI">
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3
-                                        class="text-lg font-bold text-on-surface group-hover:text-primary cursor-pointer transition-colors leading-tight">
-                                        Senior Full Stack Developer</h3>
+                                    <h3 class="text-lg font-bold text-on-surface leading-tight">
+                                        <?php echo htmlspecialchars($job['title']); ?>
+                                    </h3>
                                     <p class="text-sm font-medium text-on-surface-variant flex items-center mt-1">
-                                        Nexus Tech Solutions <span class="mx-2 text-outline-variant">•</span> London, UK
-                                        (Remote)
+                                        <?php echo htmlspecialchars($job['full_name']); ?> 
+                                        <span class="mx-2 text-outline-variant">•</span>
+                                        <?php echo htmlspecialchars($job['location'] ?? 'Location TBA'); ?>
                                     </p>
                                 </div>
-                                <button class="text-outline hover:text-primary transition-colors p-1">
-                                    <span class="material-symbols-outlined">bookmark</span>
-                                </button>
                             </div>
-                            <div
-                                class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-lg py-3 border-y border-outline-variant/10">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-lg py-3 border-y border-outline-variant/10">
                                 <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="payments">payments</span>
-                                    <span class="font-bold">£85k - £110k</span>
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline">payments</span>
+                                    <span class="font-bold">Rs. <?php echo htmlspecialchars($job['salary'] ?? 'Competitive'); ?></span>
                                 </div>
                                 <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="work_outline">work_outline</span>
-                                    <span class="">5+ Yrs Exp</span>
-                                </div>
-                                <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="schedule">schedule</span>
-                                    <span class="">2 days ago</span>
-                                </div>
-                                <div class="flex items-center text-xs text-primary">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-primary"
-                                        data-icon="verified">verified</span>
-                                    <span class="font-bold">92% Match</span>
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline">work_outline</span>
+                                    <span><?php echo htmlspecialchars($job['experience_required'] ?? 'Not specified'); ?></span>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 mt-lg">
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">React</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">Node.js</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">PostgreSQL</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">TypeScript</span>
+                            <div class="mt-lg">
+                                <p class="text-sm text-on-surface-variant line-clamp-2">
+                                    <?php echo htmlspecialchars(substr($job['description'], 0, 150)) . '...'; ?>
+                                </p>
                             </div>
                             <div class="flex items-center justify-end gap-3 mt-lg">
-                                <button
-                                    class="px-5 py-2 border border-outline-variant rounded-lg text-sm font-bold text-on-surface hover:bg-surface-container-low transition-colors"
-                                    onclick="toggleModal('ai-modal')">
-                                    Analyze Match
-                                </button>
-                                <button
+                                <a href="apply_job.php?job_id=<?php echo $job['job_id']; ?>"
                                     class="px-8 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:shadow-lg active:scale-95 transition-all">
                                     Apply Now
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Job Card 2 -->
-                <div
-                    class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 shadow-sm hover:shadow-md transition-all group">
-                    <div class="flex items-start gap-lg">
-                        <img alt="Cognitive Systems"
-                            class="w-16 h-16 rounded-xl object-contain border border-outline-variant/50 bg-surface-container-low p-2 group-hover:border-primary/50 transition-colors"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP8lNiFN47GLPaZN9D_yZORMgETmB3OkbwZ3SN_PPQ_ueuD7LuWBWFtJHY1-3rc_4ocJp4RqpA-ZWQYTwKrAozUDj3tS3JBs32NQhKXn6aByhN4oJT-enRq7YYs1h7lPvBxtBU1IPW0Xg7Yxl7Nr9_VhRNaUYiSERFe_CN2HJyJ2KPFtZy9Z0LgGscjmbqPEeWLy_pfUzzA7qWEaX7CZcZNAPaQFZpQDIEWYjjVnJVCMarR3Okk4TvAuUqRmZMEOrz0NSz3ewytgo">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3
-                                        class="text-lg font-bold text-on-surface group-hover:text-primary cursor-pointer transition-colors leading-tight">
-                                        AI Engineer (LLM focus)</h3>
-                                    <p class="text-sm font-medium text-on-surface-variant flex items-center mt-1">
-                                        Cognitive Systems <span class="mx-2 text-outline-variant">•</span> San
-                                        Francisco, CA (On-site)
-                                    </p>
-                                </div>
-                                <button class="text-outline hover:text-primary transition-colors p-1">
-                                    <span class="material-symbols-outlined">bookmark</span>
-                                </button>
-                            </div>
-                            <div
-                                class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-lg py-3 border-y border-outline-variant/10">
-                                <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="payments">payments</span>
-                                    <span class="font-bold">$160k - $210k</span>
-                                </div>
-                                <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="work_outline">work_outline</span>
-                                    <span class="">3+ Yrs Exp</span>
-                                </div>
-                                <div class="flex items-center text-xs text-on-surface-variant">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-outline"
-                                        data-icon="schedule">schedule</span>
-                                    <span class="">4h ago</span>
-                                </div>
-                                <div class="flex items-center text-xs text-primary">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 text-primary"
-                                        data-icon="verified">verified</span>
-                                    <span class="font-bold">88% Match</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 mt-lg">
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">Python</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">PyTorch</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">Transformers</span>
-                                <span
-                                    class="px-3 py-1 bg-surface-container-low text-[11px] font-bold text-on-secondary-container rounded-lg border border-outline-variant/20">GenAI</span>
-                            </div>
-                            <div class="flex items-center justify-end gap-3 mt-lg">
-                                <button
-                                    class="px-5 py-2 border border-outline-variant rounded-lg text-sm font-bold text-on-surface hover:bg-surface-container-low transition-colors"
-                                    onclick="toggleModal('ai-modal')">
-                                    Analyze Match
-                                </button>
-                                <button
-                                    class="px-8 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:shadow-lg active:scale-95 transition-all">
-                                    Apply Now
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <?php
+                    endwhile;
+                else:
+                ?>
+                <div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant/30 text-center">
+                    <p class="text-on-surface-variant">No jobs available at the moment.</p>
                 </div>
+                <?php endif; ?>
             </div>
             <!-- Right Panel: Side Modules -->
             <div class="lg:col-span-4 space-y-xl">

@@ -106,7 +106,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Job Portal Admin Console</title>
+    <title>Dashboard | Job Portal Admin</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/admin-sidebar-brand.css">
@@ -231,7 +231,7 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
     </style>
 </head>
 
-<body class="bg-surface text-on-surface min-h-screen flex">
+<body class="bg-surface text-on-surface min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
     <!-- SideNavBar Component -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
@@ -285,9 +285,13 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                     <div class="hidden lg:block text-left">
                         <p class="font-body-md font-bold text-on-surface">
                             <?php echo htmlspecialchars($admin_user['full_name']); ?></p>
-                        <p class="text-[10px] text-on-surface-variant">System Admin</p>
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">System Admin</p>
                     </div>
                 </div>
+                <div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+                <a href="../public/logout.php" class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full" title="Logout">
+                    <span class="material-symbols-outlined">logout</span>
+                </a>
             </div>
         </header>
         <!-- Page Canvas -->
@@ -385,30 +389,30 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                 </div>
             </div>
             <!-- 2. Recent Job Seekers Table -->
-            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col">
                 <div
-                    class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                    class="px-lg py-md border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low/50">
                     <h3 class="font-title-md text-on-surface">Recent Job Seekers</h3>
                     <a href="manage_users.php?role=job_seeker"
                         class="text-primary font-body-md font-bold hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left font-body-md">
+                    <table class="w-full text-left font-body-md border-collapse">
                         <thead>
                             <tr
-                                class="bg-surface-container-low text-on-surface-variant border-b border-outline-variant">
-                                <th class="px-lg py-md font-bold">Candidate</th>
-                                <th class="px-lg py-md font-bold">Top Skills</th>
-                                <th class="px-lg py-md font-bold text-center">Apps</th>
-                                <th class="px-lg py-md font-bold text-right">Status</th>
+                                class="bg-surface-container-low/50 text-on-surface-variant border-b border-outline-variant/20">
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Candidate</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Top Skills</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Apps</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-outline-variant">
+                        <tbody class="divide-y divide-outline-variant/10">
                             <?php while ($seeker = $job_seekers_query->fetch_assoc()):
                                 $initials = strtoupper(substr($seeker['full_name'], 0, 1) . substr(explode(' ', $seeker['full_name'])[1] ?? '', 0, 1));
                                 ?>
-                                <tr>
-                                    <td class="px-lg py-md">
+                                <tr class="hover:bg-surface-container-low/30 transition-colors">
+                                    <td class="px-lg py-4">
                                         <div class="flex items-center gap-md">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs">
@@ -422,49 +426,50 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-lg py-md">
+                                    <td class="px-lg py-4">
                                         <div class="flex gap-xs">
                                             <span
                                                 class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold">Job
                                                 Seeker</span>
                                         </div>
                                     </td>
-                                    <td class="px-lg py-md text-center font-bold text-on-surface-variant">
+                                    <td class="px-lg py-4 text-center font-bold text-on-surface-variant">
                                         <?php echo $seeker['app_count']; ?></td>
-                                    <td class="px-lg py-md text-right">
+                                    <td class="px-lg py-4 text-right">
                                         <span
                                             class="text-[10px] font-bold uppercase tracking-wider text-on-tertiary-fixed bg-tertiary-fixed px-2 py-1 rounded-full">Active</span>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
+                        </tbody>
                     </table>
                 </div>
             </section>
             <!-- 3. Recent Recruiters Table -->
-            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+            <section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden flex flex-col">
                 <div
-                    class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+                    class="px-lg py-md border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low/50">
                     <h3 class="font-title-md text-on-surface">Recent Recruiters</h3>
                     <a href="manage_users.php?role=recruiter"
                         class="text-primary font-body-md font-bold hover:underline">View All</a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left font-body-md">
+                    <table class="w-full text-left font-body-md border-collapse">
                         <thead>
                             <tr
-                                class="bg-surface-container-low text-on-surface-variant border-b border-outline-variant">
-                                <th class="px-lg py-md font-bold">Recruiter</th>
-                                <th class="px-lg py-md font-bold">Industry</th>
-                                <th class="px-lg py-md font-bold text-center">Jobs Posted</th>
-                                <th class="px-lg py-md font-bold text-right">Status</th>
+                                class="bg-surface-container-low/50 text-on-surface-variant border-b border-outline-variant/20">
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Recruiter</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Industry</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-center">Jobs Posted</th>
+                                <th class="px-lg py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-outline-variant">
+                        <tbody class="divide-y divide-outline-variant/10">
                             <?php while ($recruiter = $recruiters_query->fetch_assoc()):
                                 $initials = strtoupper(substr($recruiter['full_name'], 0, 1) . substr(explode(' ', $recruiter['full_name'])[1] ?? '', 0, 1));
                                 ?>
-                                <tr>
-                                    <td class="px-lg py-md">
+                                <tr class="hover:bg-surface-container-low/30 transition-colors">
+                                    <td class="px-lg py-4">
                                         <div class="flex items-center gap-md">
                                             <div
                                                 class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-xs">
@@ -478,17 +483,18 @@ $total_rejected = $funnel_counts['rejected'] ?? 0;
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-lg py-md">
+                                    <td class="px-lg py-4">
                                         <span class="text-xs font-medium text-on-surface-variant">Recruitment</span>
                                     </td>
-                                    <td class="px-lg py-md text-center font-bold text-on-surface-variant">
+                                    <td class="px-lg py-4 text-center font-bold text-on-surface-variant">
                                         <?php echo $recruiter['jobs_posted']; ?></td>
-                                    <td class="px-lg py-md text-right">
+                                    <td class="px-lg py-4 text-right">
                                         <span
                                             class="text-[10px] font-bold uppercase tracking-wider text-on-primary-container bg-primary-container/20 px-2 py-1 rounded-full border border-primary-container/30">Verified</span>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
+                        </tbody>
                     </table>
                 </div>
             </section>

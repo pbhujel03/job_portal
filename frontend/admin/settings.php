@@ -88,7 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             if ($is_system_admin) {
                 $_SESSION['name'] = $full_name;
                 $admin_user['full_name'] = $full_name;
-                $success_message = 'Display name updated for this session.';
+                save_setting($conn, 'admin_name', $full_name);
+                $success_message = 'Admin name updated successfully.';
             } else {
                 $check = $conn->prepare('SELECT user_id FROM users WHERE email = ? AND user_id != ?');
                 $check->bind_param('si', $email, $uid);
@@ -262,7 +263,7 @@ $timezones = [
                         "outline": "#777587",
                         "error-container": "#ffdad6",
                         "on-tertiary": "#ffffff",
-                        "primary": "#4f46e5",
+                        "primary": "#3525cd",
                         "tertiary-fixed": "#ffdbcc",
                         "inverse-surface": "#213145",
                         "surface-container-low": "#eff4ff",
@@ -351,20 +352,19 @@ $timezones = [
         class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-desktop z-40">
         <div></div>
         <div class="flex items-center space-x-6">
-            <button
-                class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full relative">
-                <span class="material-symbols-outlined">help_outline</span>
-            </button>
-            <div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
             <div class="flex items-center gap-sm">
                 <div class="w-10 h-10 rounded-full border-2 border-primary-container bg-primary-fixed flex items-center justify-center text-on-primary-fixed font-bold">
-                    <?php echo strtoupper(substr($admin_user['full_name'], 0, 1)); ?>
+                    <?php echo strtoupper(substr($admin_user['full_name'], 0, 1) . substr(explode(' ', $admin_user['full_name'])[1] ?? '', 0, 1)); ?>
                 </div>
                 <div class="hidden lg:block text-left">
                     <p class="font-body-md text-body-md font-bold text-on-surface"><?php echo htmlspecialchars($admin_user['full_name']); ?></p>
-                    <p class="font-label-md text-label-md text-on-surface-variant">System Admin</p>
+                    <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">System Admin</p>
                 </div>
             </div>
+            <div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+            <a href="../public/logout.php" class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full" title="Logout">
+                <span class="material-symbols-outlined">logout</span>
+            </a>
         </div>
     </header>
     <!-- Main Content Area -->

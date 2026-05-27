@@ -10,8 +10,15 @@ if (isset($_POST['login'])) {
 
     // 1. Hardcoded Admin Check
     if ($email === 'admin@jobportal.com' && $password === 'Admin123') {
+        // Get admin name from system_settings, fallback to default
+        $admin_name = 'System Administrator';
+        $settings_result = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'admin_name' LIMIT 1");
+        if ($settings_result && $settings_result->num_rows > 0) {
+            $setting_row = $settings_result->fetch_assoc();
+            $admin_name = $setting_row['setting_value'] ?? 'System Administrator';
+        }
         $_SESSION['user_id'] = 0; // Standard placeholder ID for system admin
-        $_SESSION['name'] = 'System Administrator';
+        $_SESSION['name'] = $admin_name;
         $_SESSION['role'] = 'admin';
 
         header("Location: ../admin/dashboard.php");

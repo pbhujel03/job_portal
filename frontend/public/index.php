@@ -145,16 +145,7 @@
                     </div>
                 </a>
 
-                <nav class="hidden md:flex items-center gap-unit-lg">
-                    <a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1"
-                        href="#">Jobs</a>
-                    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
-                        href="#">Companies</a>
-                    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
-                        href="#">Salaries</a>
-                    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
-                        href="#">Resources</a>
-                </nav>
+
             </div>
             <div class="flex items-center gap-unit-md">
                 <a href="login.php"
@@ -181,24 +172,17 @@
                         opportunities from top companies around the world</p>
                     <!-- Search Bar Interface -->
                     <div
-                        class="w-full bg-surface p-unit-sm rounded-xl shadow-lg border border-outline-variant flex flex-col md:flex-row gap-unit-sm">
+                        class="w-full bg-surface p-unit-sm rounded-xl shadow-lg border border-outline-variant flex items-center gap-unit-sm">
                         <div
-                            class="flex-1 flex items-center px-unit-md border-b md:border-b-0 md:border-r border-outline-variant">
+                            class="flex-1 flex items-center px-unit-md">
                             <span class="material-symbols-outlined text-primary mr-unit-sm"
                                 data-icon="search">search</span>
                             <input
                                 class="w-full border-none focus:ring-0 bg-transparent text-body-md py-3 text-on-background"
-                                placeholder="Job title, keywords, or company" type="text" />
-                        </div>
-                        <div class="flex-1 flex items-center px-unit-md">
-                            <span class="material-symbols-outlined text-primary mr-unit-sm"
-                                data-icon="location_on">location_on</span>
-                            <input
-                                class="w-full border-none focus:ring-0 bg-transparent text-body-md py-3 text-on-background"
-                                placeholder="City, state, or remote" type="text" />
+                                placeholder="Search by job title, keywords, or company" type="text" />
                         </div>
                         <button
-                            class="bg-primary text-white px-unit-xl py-3 rounded-lg font-label-md hover:brightness-110 transition-all shadow-sm">Browse
+                            class="bg-primary text-white px-unit-xl py-3 rounded-lg font-label-md hover:brightness-110 transition-all shadow-sm">Search
                             Jobs</button>
                     </div>
                 </div>
@@ -220,11 +204,6 @@
                         <h2 class="font-headline-lg text-headline-lg text-on-background mb-unit-xs">Available Jobs</h2>
                         <p class="font-body-md text-on-surface-variant">Latest job opportunities from top companies</p>
                     </div>
-                    <a class="text-primary font-label-md hover:underline flex items-center gap-1 group" href="#">
-                        View all jobs <span
-                            class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform"
-                            data-icon="arrow_forward">arrow_forward</span>
-                    </a>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-unit-lg">
                     <?php

@@ -71,7 +71,7 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>User Management | RecruitAdmin</title>
+    <title>User Management | Job Portal Admin</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
         rel="stylesheet">
@@ -187,7 +187,7 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
     </style>
 </head>
 
-<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<body class="bg-surface text-on-surface min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
     <!-- SideNavBar Shell -->
     <aside
         class="fixed h-full left-0 top-0 w-64 bg-on-secondary-fixed dark:bg-inverse-surface flex flex-col py-lg px-md z-50">
@@ -240,9 +240,13 @@ $recruiters_count = $conn->query("SELECT COUNT(*) as count FROM users WHERE role
                     <div class="hidden lg:block text-left">
                         <p class="font-body-md font-bold text-on-surface">
                             <?php echo htmlspecialchars($admin_user['full_name']); ?></p>
-                        <p class="font-label-md text-label-md text-on-surface-variant">System Admin</p>
+                        <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">System Admin</p>
                     </div>
                 </div>
+                <div class="h-8 w-[1px] bg-outline-variant/30 mx-2"></div>
+                <a href="../public/logout.php" class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full" title="Logout">
+                    <span class="material-symbols-outlined">logout</span>
+                </a>
             </div>
         </header>
         <!-- Content Canvas -->
